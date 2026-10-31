@@ -549,3 +549,57 @@ a {
   -ms-animation: blink normal 4s infinite ease-in-out; /* IE */
   animation: blink normal 4s infinite ease-in-out; /* Opera and prob css3 final iteration */
 }
+
+
+/*
+ * Android landscape layout:
+ * The Android wrapper locks the native activity to landscape. These rules make
+ * the Phaser canvas occupy the full available screen and keep touch buttons as
+ * transparent overlays, so taps on the game itself reach Phaser.
+ */
+@media (orientation: landscape) and (pointer: coarse) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    box-sizing: border-box;
+    padding: 0;
+    align-items: stretch;
+  }
+
+  #app {
+    flex: 1 1 auto;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    min-width: 0;
+    min-height: 0;
+    align-items: center !important;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  body:has(> #touchControls.visible) #app {
+    align-items: center !important;
+  }
+
+  body:has(> #touchControls.visible) #app > div:first-child {
+    transform-origin: center !important;
+  }
+
+  #touchControls {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  #touchControls .control-group {
+    pointer-events: auto;
+  }
+}
