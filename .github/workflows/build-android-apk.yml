@@ -64,6 +64,60 @@ jobs:
         working-directory: android-wrapper
         run: python3 prepare-android.py
 
+      - name: Configurar orientação horizontal e tela cheia
+        working-directory: android-wrapper
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          tree = ET.parse(manifest)
+          root = tree.getroot()
+          android_ns = "{http://schemas.android.com/apk/res/android}"
+          activity = root.find(".//activity")
+          if activity is None:
+              raise SystemExit("Activity principal não encontrada no manifesto Android")
+          activity.set(android_ns + "screenOrientation", "landscape")
+          tree.write(manifest, encoding="utf-8", xml_declaration=True)
+
+          java_dir = Path("android/app/src/main/java/com/pedra12/pokerogue")
+          java_dir.mkdir(parents=True, exist_ok=True)
+          main_activity = java_dir / "MainActivity.java"
+          main_activity.write_text("""package com.pedra12.pokerogue;
+
+          import android.os.Bundle;
+          import android.view.View;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              private void enableImmersiveMode() {
+                  getWindow().getDecorView().setSystemUiVisibility(
+                      View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                      | View.SYSTEM_UI_FLAG_FULLSCREEN
+                      | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                      | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                      | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                  );
+              }
+
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  enableImmersiveMode();
+              }
+
+              @Override
+              public void onWindowFocusChanged(boolean hasFocus) {
+                  super.onWindowFocusChanged(hasFocus);
+                  if (hasFocus) enableImmersiveMode();
+              }
+          }
+          """)
+          PY
+
       - name: Sincronizar jogo com Android
         working-directory: android-wrapper
         run: npx cap sync android
