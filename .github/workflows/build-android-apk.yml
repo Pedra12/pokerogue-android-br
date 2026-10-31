@@ -1,0 +1,78 @@
+name: Gerar APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "android-wrapper/**"
+      - ".github/workflows/build-android-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Baixar projeto e submódulos
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+          run_install: false
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependências do jogo
+        run: pnpm install --frozen-lockfile
+
+      - name: Compilar versão destinada ao app
+        run: pnpm build:app
+
+      - name: Preparar arquivos web para Android
+        run: |
+          mkdir -p android-wrapper/www
+          cp -a dist/. android-wrapper/www/
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Instalar dependências Capacitor
+        working-directory: android-wrapper
+        run: npm install
+
+      - name: Criar projeto Android nativo
+        working-directory: android-wrapper
+        run: npx cap add android
+
+      - name: Sincronizar jogo com Android
+        working-directory: android-wrapper
+        run: npx cap sync android
+
+      - name: Compilar APK de depuração
+        working-directory: android-wrapper/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Publicar APK para instalação
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokerogue-android-debug-apk
+          path: android-wrapper/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
