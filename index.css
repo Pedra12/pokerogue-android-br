@@ -599,7 +599,15 @@ a {
     pointer-events: none;
   }
 
-  #touchControls .control-group {
+  #touchControls .control-group,
+  #touchControls [data-key] {
     pointer-events: auto;
+    touch-action: none;
+  }
+
+  #app,
+  #app canvas,
+  #app > div {
+    touch-action: none;
   }
 }
