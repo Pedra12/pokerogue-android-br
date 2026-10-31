@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "android-wrapper/**"
+      - "index.css"
       - ".github/workflows/build-android-apk.yml"
 
 permissions:
@@ -58,6 +59,10 @@ jobs:
       - name: Criar projeto Android nativo
         working-directory: android-wrapper
         run: npx cap add android
+
+      - name: Configurar tela horizontal e modo imersivo
+        working-directory: android-wrapper
+        run: python3 prepare-android.py
 
       - name: Sincronizar jogo com Android
         working-directory: android-wrapper
