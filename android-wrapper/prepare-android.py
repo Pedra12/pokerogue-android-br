@@ -27,10 +27,10 @@ if activity is None:
     raise SystemExit("Activity MainActivity não encontrada no AndroidManifest.xml")
 
 activity.set(f"{{{ANDROID_NS}}}screenOrientation", "landscape")
-activity.set(
-    f"{{{ANDROID_NS}}}configChanges",
-    "orientation|screenSize|screenLayout|keyboardHidden",
-)
+existing_config_changes = activity.get(f"{{{ANDROID_NS}}}configChanges", "")
+config_changes = set(filter(None, existing_config_changes.split("|")))
+config_changes.update({"orientation", "screenSize", "screenLayout", "keyboardHidden"})
+activity.set(f"{{{ANDROID_NS}}}configChanges", "|".join(sorted(config_changes)))
 tree.write(MANIFEST, encoding="utf-8", xml_declaration=True)
 
 java_file = next(ANDROID.glob("app/src/main/java/**/MainActivity.java"), None)
