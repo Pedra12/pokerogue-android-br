@@ -1,0 +1,8 @@
+{
+  "appId": "com.pedra12.pokerogue",
+  "appName": "PokéRogue",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  }
+}
