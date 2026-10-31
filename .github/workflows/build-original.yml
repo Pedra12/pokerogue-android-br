@@ -19,14 +19,17 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      - name: Instalar pnpm na versão do projeto
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+          run_install: false
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
-
-      - name: Ativar pnpm
-        run: corepack enable
 
       - name: Instalar dependências sem alterar versões
         run: pnpm install --frozen-lockfile
