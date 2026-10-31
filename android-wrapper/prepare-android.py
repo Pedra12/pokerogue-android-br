@@ -38,7 +38,7 @@ if java_file is None:
     raise SystemExit("MainActivity.java não encontrado no projeto Android gerado")
 
 source = java_file.read_text(encoding="utf-8")
-match = re.search(r"^package\\s+([\\w.]+);", source, re.MULTILINE)
+match = re.search(r"^package\s+([\w.]+);", source, re.MULTILINE)
 if not match:
     raise SystemExit("Não foi possível identificar o package da MainActivity")
 
