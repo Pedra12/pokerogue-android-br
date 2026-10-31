@@ -1,0 +1,17 @@
+{
+  "name": "pokerogue-android-wrapper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capacitor Android wrapper for the original PokéRogue web build",
+  "scripts": {
+    "cap:add": "cap add android",
+    "cap:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.4.3",
+    "@capacitor/core": "7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.4.3"
+  }
+}
